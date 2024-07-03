@@ -1,0 +1,70 @@
+{%extends "rent/layout.html"%}
+
+{% block body %}
+
+    <h2>Kayıt Ol</h2>
+    <div id="message"></div>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <input class="form-control" autofocus type="text" name="username" id="username" placeholder="Username">
+        </div>
+        <div class="mb-3">
+            <input class="form-control" type="email" name="email" id="email"  placeholder="Email Address">
+        </div>
+        <div class="mb-3">
+            <input class="form-control" type="password" name="password" id="password" placeholder="Password">
+        </div>
+        <button type="button" class="btn btn-primary" id="register-button">Kayıt ol</button>
+        <!-- <a href="{% url 'register'%}">Kayıt ol.</a> -->
+        <!-- <input class="btn btn-primary" type="submit"  value="Kayıt ol"> -->
+    </form>
+
+     <a href="{% url 'login'%}">Giriş yap buradan.</a>
+     <script>
+        $(document).ready(function() {
+            $('#register-button').click(function() {
+                const username = $('#username').val();
+                const email = $('#email').val();
+                const password = $('#password').val();
+                const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+                
+                $.ajax({
+                    url: '/register/',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    data: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    }),
+                    success: function(data) {
+                        $('#message').html('<div class="alert alert-success">Registration successful!</div>');
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Registration failed. ';
+                        const response = xhr.responseJSON;
+                        if (response.username) {
+                            errorMessage += `Username: ${response.username.join(', ')}. `;
+                        }
+                        if (response.email) {
+                            errorMessage += `Email: ${response.email.join(', ')}. `;
+                        }
+                        if (response.password) {
+                            errorMessage += `Password: ${response.password.join(', ')}. `;
+                        }
+                        $('#username').val('');
+                        $('#email').val('');
+                        $('#password').val('');
+                        $('#message').html(`<div class="alert alert-danger">${errorMessage}</div>`);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

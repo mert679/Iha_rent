@@ -1,0 +1,65 @@
+{%extends "rent/layout.html"%}
+
+{%block body%}
+<h2>Giriş yap</h2>
+<div id="message"></div>
+
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <div class="mb-3">
+    <input
+      autofocus
+      class="form-control"
+      type="text"
+      name="username"
+      placeholder="Username"
+      id = "username"
+    />
+  </div>
+  <div class="mb-3">
+    <input
+      class="form-control"
+      type="password"
+      name="password"
+      placeholder="Password"
+      id="password"
+    />
+  </div>
+  <button type="button" class="btn btn-primary" id="login-button">Giriş</button>
+
+  <!-- <input class="btn btn-primary" type="submit" value="Giriş"/> -->
+</form>
+
+ Hesabın yoksa? <a href="{%url 'register'%}">Kayıt ol buradan.</a>
+
+ <script>
+  $(document).ready(function() {
+      $('#login-button').click(function() {
+          const username = $('#username').val();
+          const password = $('#password').val();
+          const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+          
+          $.ajax({
+              url: '/login/',
+              type: 'POST',
+              contentType: 'application/json',
+              headers: {
+                  'X-CSRFToken': csrfToken
+              },
+              data: JSON.stringify({
+                  username: username,
+                  password: password
+              }),
+              success: function(data) {
+                  $('#message').html('<div class="alert alert-success">Login successful!</div>');
+                  window.location.href = data.redirect_url
+              },
+              error: function(xhr) {
+                  $('#message').html('<div class="alert alert-danger">There is no user</div>');
+              }
+          });
+      });
+  });
+</script>
+{%endblock%}
